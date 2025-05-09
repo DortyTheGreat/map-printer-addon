@@ -460,6 +460,28 @@ public class CarpetPrinter extends Module {
             if (lineFinished) continue;
             Vec3d cp1 = mapCorner.toCenterPos().add(x,0,0);
             Vec3d cp2 = mapCorner.toCenterPos().add(x,0,127);
+			/// todo: add more checkpoints
+			/// todo: BIG TODO
+			/**
+			
+				Current system of checkpoints suggests "path injections" upon requirement. 
+				AKA: we build, if we ran out of recources -> restock
+				
+				A more optimized uproach would be to pack ebough recources for exactly 2 lines of width 5.
+				(Math goes like this: 16 slots could be in worst case ~1 item, leaving space for 20 slots, that
+				results in 20 * 64 = 1280 items, while there is 5 * 2 * 128 = 2 * 64 = 1280 items, so everything checks out)
+				
+				The goal is to remove interupts. This way making build proccess more like this:
+				
+				0) restock at the bottom (preffered restock station location)
+				1) go from bottom to top
+				2) go from top to bottom
+				3) restock again, repeat 1-3 until no more lines to be done
+				4) do the rest: update the map, rename the map, create the map, get xp, etc., etc.
+				
+				
+				ALSO: make this bot to stop. Really important for Grim bypass
+			*/
             if (isStartSide) {
                 checkpoints.add(new Pair(cp1, new Pair("", null)));
                 checkpoints.add(new Pair(cp2, new Pair("lineEnd", null)));
@@ -854,7 +876,8 @@ public class CarpetPrinter extends Module {
             }
             closeNextInvPacket = false;
         }
-
+		
+		/// todo: handle other states (new)
         if (!state.equals(State.Walking)) return;
         Utils.setWPressed(true);
         Vec3d goal = checkpoints.get(0).getLeft();
@@ -988,7 +1011,9 @@ public class CarpetPrinter extends Module {
         }
         final List<String> allowPlaceActions = Arrays.asList("", "lineEnd", "sprint");
         if (!allowPlaceActions.contains(nextAction)) return;
-
+		
+		
+		/// todo: put building into separate state
         ArrayList<BlockPos> placements = new ArrayList<>();
         for (int i = 0; i < allowedPlacements; i++) {
             AtomicReference<BlockPos> closestPos = new AtomicReference<>();
